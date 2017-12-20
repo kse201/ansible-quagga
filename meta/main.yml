@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  author: "kse201"
+  description: "install quagga"
+  license: MIT
+
+  min_ansible_version: 2.2
+
+  platforms:
+    - name: RedHat
+
+  categorizes:
+    - development

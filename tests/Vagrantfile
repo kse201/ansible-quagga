@@ -1,0 +1,80 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure('2') do |config|
+  num_instances = 3
+  instance_name_prefix = 'node'
+  # userdata = File.read('userdata')
+
+  nodes = {
+    1 => {
+      networks: [
+        { name: 'priv_network_1', addr: '192.0.1.101' },
+        { name: 'priv_network_3', addr: '192.0.3.105' },
+        { name: 'priv_network_5', addr: '192.0.5.106' }
+      ]
+    },
+    2 => {
+      networks: [
+        { name: 'priv_network_1', addr: '192.0.1.102' },
+        { name: 'priv_network_2', addr: '192.0.2.103' },
+        { name: 'priv_network_3', addr: '192.0.3.107' },
+        { name: 'priv_network_4', addr: '192.0.4.108' }
+      ]
+    },
+    3 => {
+      networks: [
+        { name: 'priv_network_2', addr: '192.0.2.104' },
+        { name: 'priv_network_4', addr: '192.0.4.109' },
+        { name: 'priv_network_5', addr: '192.0.5.110' }
+      ]
+    }
+  }
+
+  config.vm.box = 'centos/7'
+
+  config.vm.provider :virtualbox do |vb|
+    vb.cpus = 2
+    vb.memory = 4096
+    vb.gui = false
+  end
+
+  config.vm.provider :libvirt do |lv|
+    lv.cpus = 2
+    lv.memory = 4096
+    lv.random_hostname = true
+  end
+
+  # config.vm.provision :shell, privileged: false, inline: userdata
+
+  (1..num_instances).each do |i|
+    config.vm.define vm_name = format('%s%d', instance_name_prefix, i) do |cfg|
+      cfg.vm.hostname = vm_name
+
+      cfg.vm.provider :libvirt do |lv|
+        # lv.graphics_port = 5900 + i
+      end
+
+      nodes[i][:networks].each do |network|
+        cfg.vm.network :private_network,
+          ip: network[:addr],
+          libvirt__network_name: network[:name]
+      end
+    end
+  end
+
+  config.vm.provision :ansible do |ansible|
+    ansible.verbose = 'v'
+    ansible.limit = 'all'
+    ansible.playbook = 'site.yml'
+    ansible.inventory_path = './inventories/hosts'
+#    ansible.raw_ssh_args = '-F ./ssh_config'
+  end
+end
+
+# vim: ft=ruby
+

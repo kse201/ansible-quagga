@@ -1,0 +1,11 @@
+---
+- name: prepare for setup
+  become: yes
+  hosts: all
+  roles:
+    - basics
+    - quagga
+  environment:
+    http_proxy: "http://{{ proxy.user }}:{{ proxy.password }}@{{ proxy.hostname }}:{{ proxy.port }}"
+    https_proxy: "http://{{ proxy.user }}:{{ proxy.password }}@{{ proxy.hostname }}:{{ proxy.port }}"
+    no_proxy: "localhost,127.0.0.1,{{ play_hosts | join(',') }}"

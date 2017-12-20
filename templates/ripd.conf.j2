@@ -1,0 +1,30 @@
+! -*- rip -*-
+!
+! RIPd sample configuration file
+!
+! $Id: ripd.conf.sample,v 1.1 2002/12/13 20:15:30 paul Exp $
+!
+hostname ripd
+password zebra
+!
+debug rip events
+debug rip packet
+debug rip zebra
+!
+router rip
+  timers basic 5 10 10
+{% for interface in hostvars[inventory_hostname]["interfaces"] %}
+  network {{ interface }}
+  no passive-interface {{ interface }}
+{% endfor %}
+
+{% for interface in hostvars[inventory_hostname]["interfaces"] %}
+interface {{ interface }}
+  no ip rip authentication mode
+{% endfor %}
+
+!
+!access-list private-only permit 10.0.0.0/8
+!access-list private-only deny any
+!
+log file /var/log/quagga/ripd.log debugging

@@ -1,0 +1,12 @@
+desc 'boot vm'
+task :up do
+  exec('vagrant up --no-provision && vagrant ssh-config > ssh_config')
+end
+
+desc 'provision'
+task :provision do
+  exec('ansible-playbook -i inventories/hosts site.yml')
+end
+
+task default: :all
+task all: %i[up provision]

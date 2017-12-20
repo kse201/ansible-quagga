@@ -1,0 +1,33 @@
+---
+# tasks file for quagga
+- name: install quagga
+  yum:
+    name: quagga
+
+- name: enable port forwarding
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: deploy ripd.conf
+  template:
+    src: ripd.conf.j2
+    dest: /etc/quagga/ripd.conf
+    owner: quagga
+    group: quagga
+    mode: 0644
+  notify:
+    - start ripd
+
+- name: deploy zebra.conf
+  template:
+    src: zebra.conf.j2
+    dest: /etc/quagga/zebra.conf
+    owner: quagga
+    group: quagga
+    mode: 0644
+  notify:
+    - start zebra

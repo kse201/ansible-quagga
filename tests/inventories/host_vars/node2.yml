@@ -1,0 +1,6 @@
+---
+interfaces:
+  - eth1
+  - eth2
+  - eth3
+  - eth4

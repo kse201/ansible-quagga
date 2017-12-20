@@ -1,0 +1,10 @@
+---
+- name: start zebra
+  service:
+    name: zebra
+    state: restarted
+
+- name: start ripd
+  service:
+    name: ripd
+    state: restarted
